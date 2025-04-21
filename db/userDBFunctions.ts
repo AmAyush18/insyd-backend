@@ -80,3 +80,13 @@ export const followUser = async (followerId: string, followingId: string) => {
 
   return newFollow;
 };
+
+export const createPost = async (title: string, content: string, authorId: string) => {
+  return await prisma.post.create({
+    data: {
+      title,
+      content,
+      authorId,
+    },
+  });
+};

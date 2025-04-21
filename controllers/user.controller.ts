@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "../middlewares/catchAsyncError";
 import { handleErrors } from "../middlewares/errorHandler";
-import { followUser, getAllUsersBasicDetails, getUserById } from "../db/userDBFunctions";
+import { createPost, followUser, getAllUsersBasicDetails, getUserById } from "../db/userDBFunctions";
 
 export const getAllUsers = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -59,3 +59,28 @@ export const followUserController = CatchAsyncError(
       }
     }
 );
+
+export const addPost = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { title, content, authorId } = req.body;
+  
+        if (!title || !content || !authorId) {
+          return res.status(400).json({
+            success: false,
+            message: "Title, content, and authorId are required.",
+          });
+        }
+  
+        const newPost = await createPost(title, content, authorId);
+  
+        res.status(201).json({
+          success: true,
+          message: "Post created successfully",
+          data: newPost,
+        });
+      } catch (error) {
+        handleErrors(error as Error, req, res, next);
+      }
+    }
+  );

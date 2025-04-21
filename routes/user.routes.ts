@@ -1,5 +1,5 @@
 import express from 'express';
-import { followUserController, getAllUsers, getUser } from '../controllers/user.controller';
+import { addPost, followUserController, getAllUsers, getUser } from '../controllers/user.controller';
 
 const userRouter = express.Router();
 
@@ -16,6 +16,11 @@ userRouter.get(
 userRouter.post(
     "/follow", 
     followUserController
+);
+
+userRouter.post(
+    "/post", 
+    addPost
 );
 
 export default userRouter;
