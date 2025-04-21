@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  username      String         @unique
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+
+  following     Follow[]       @relation("FollowingRelation")
+  followers     Follow[]       @relation("FollowerRelation")
+
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Post {
+  id           String         @id @default(cuid())
+  title        String
+  content      String
+  author       User           @relation(fields: [authorId], references: [id])
+  authorId     String
+  comments     Comment[]
+  likes        Like[]
+  notifications Notification[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Comment {
+  id           String         @id @default(cuid())
+  content      String
+  post         Post           @relation(fields: [postId], references: [id])
+  postId       String
+  author       User           @relation(fields: [authorId], references: [id])
+  authorId     String
+  notifications Notification[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    String?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+
+  follower    User     @relation("FollowingRelation", fields: [followerId], references: [id])
+  followerId  String
+
+  following   User     @relation("FollowerRelation", fields: [followingId], references: [id])
+  followingId String
+
+  createdAt   DateTime @default(now())
+}
