@@ -47,3 +47,36 @@ export const getUserById = async (id: string) => {
     throw error;
   }
 };
+
+export const followUser = async (followerId: string, followingId: string) => {
+  if (followerId === followingId) {
+    throw new Error("You cannot follow yourself.");
+  }
+
+  const existingFollow = await prisma.follow.findFirst({
+    where: {
+      followerId,
+      followingId,
+    },
+  });
+
+  if (existingFollow) {
+    throw new Error("You are already following this user.");
+  }
+
+  const newFollow = await prisma.follow.create({
+    data: {
+      followerId,
+      followingId,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      type: "FOLLOW",
+      userId: followingId,
+    },
+  });
+
+  return newFollow;
+};

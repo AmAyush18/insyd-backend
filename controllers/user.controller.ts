@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { CatchAsyncError } from "../middlewares/catchAsyncError";
 import { handleErrors } from "../middlewares/errorHandler";
-import { getAllUsersBasicDetails, getUserById } from "../db/userDBFunctions";
+import { followUser, getAllUsersBasicDetails, getUserById } from "../db/userDBFunctions";
 
 export const getAllUsers = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -32,5 +32,30 @@ export const getUser = CatchAsyncError(
         } catch (error) {
         next(error);
         }
+    }
+);
+
+export const followUserController = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { followerId, followingId } = req.body;
+  
+        if (!followerId || !followingId) {
+          return res.status(400).json({
+            success: false,
+            message: "Both followerId and followingId are required",
+          });
+        }
+  
+        const result = await followUser(followerId, followingId);
+  
+        res.status(201).json({
+          success: true,
+          message: "User followed successfully",
+          data: result,
+        });
+      } catch (error) {
+        next(error);
+      }
     }
 );

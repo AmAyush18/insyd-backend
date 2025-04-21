@@ -6,6 +6,8 @@ import userRouter from "./routes/user.routes";
 
 dotenv.config();
 
+app.use(express.json({ limit: "1mb" }));
+
 // cors
 app.use(
   cors({
